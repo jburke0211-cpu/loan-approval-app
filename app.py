@@ -1,3 +1,4 @@
+%%writefile app.py
 
 # -*- coding: utf-8 -*-
 import streamlit as st
@@ -5,16 +6,12 @@ import pickle
 import pandas as pd
 import sklearn  # Needed so sklearn objects inside the pickle can be loaded
 
-# -------------------------
 # Load the trained (logistic regression) model
-# -------------------------
 # Make sure my_logmodel.pkl is in the same folder as this app file.
 with open("my_logmodel.pkl", "rb") as file:
     model = pickle.load(file)
 
-# -------------------------
 # App title
-# -------------------------
 st.markdown(
     "<h1 style='text-align: center; background-color: #ffcccc; "
     "padding: 10px; color: #cc0000;'><b>Personal Loan Approval</b></h1>",
@@ -23,9 +20,7 @@ st.markdown(
 
 st.header("Enter Applicant Details")
 
-# -------------------------
 # Numeric inputs
-# -------------------------
 requested_loan_amount = st.number_input(
     "Requested Loan Amount", min_value=0.0, step=500.0
 )
@@ -52,42 +47,44 @@ ever_bankrupt = st.selectbox(
     ["No", "Yes"]
 )
 
-# -------------------------
+
 # Categorical inputs
-# -------------------------
+
 reason = st.selectbox(
     "Reason for Loan",
     [
-        "credit_card_refinancing",
-        "debt_consolidation",
-        "home_improvement",
         "cover_an_unexpected_cost",
+        "credit_card_refinancing",
+        "home_improvement",
         "major_purchase",
         "other",
+        "debt_conslidation"
     ]
 )
 
 employment_status = st.selectbox(
     "Employment Status",
     [
-        "Employed",
-        "Self-employed",
-        "Unemployed",
-        "Retired",
-        "Student",
-        "Other",
+        "full_time",
+        "part_time",
+        "unemployed"
     ]
 )
 
 employment_sector = st.selectbox(
     "Employment Sector",
     [
-        "Private",
-        "Public",
-        "Government",
-        "Non-profit",
-        "Self-employed",
-        "Other",
+        "consumer_discretionary",
+        "information_technology",
+        "energy",
+        "consumer_staples",
+        "communication_services",
+        "materials",
+        "utilities",
+        "real_estate",
+        "health_care",
+        "industrials",
+        "financials"
     ]
 )
 
@@ -96,9 +93,8 @@ lender = st.selectbox(
     ["A", "B", "C"]
 )
 
-# -------------------------
+
 # Build single-row DataFrame
-# -------------------------
 input_data = pd.DataFrame(
     {
         "Requested_Loan_Amount": [requested_loan_amount],
@@ -114,9 +110,8 @@ input_data = pd.DataFrame(
     }
 )
 
-# -------------------------
+
 # Prepare data for prediction
-# -------------------------
 
 # One-hot encode categorical variables
 categorical_cols = [
@@ -138,9 +133,7 @@ for col in model_columns:
 # Reorder and drop unknown columns
 input_data_encoded = input_data_encoded[model_columns]
 
-# -------------------------
 # Prediction
-# -------------------------
 if st.button("Evaluate Loan"):
     # Class prediction (0 = denied, 1 = approved)
     pred_class = model.predict(input_data_encoded)[0]
